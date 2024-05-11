@@ -80,8 +80,20 @@ mutate(dat, age = cut(age, breaks = c(min(dat$age), 20, 40, 60, 70, 80, max(dat$
   summarise(total = sum(count)) %>% 
   ggplot(aes(x = age, y = total, fill = year)) +
   geom_col(position = "dodge", color = "black") +
+  geom_label(aes(y = ifelse(total > 34000, total * 0.75, total + 30000), label = total), angle = 90, position = position_dodge(width = 1), 
+             hjust = 1, size = 2.9) +
   scale_fill_manual(values = rev(gray.colors(4))) +
   ggtitle("Po zmianach")
+
+mutate(dat, age = cut(age, breaks = c(min(dat$age), 20, 40, 60, 70, 80, max(dat$age)), include.lowest = TRUE),
+       year = factor(year)) %>% 
+  group_by(year, age) %>% 
+  summarise(total = sum(count)) %>% 
+  ggplot(aes(x = age, y = total, fill = year)) +
+  geom_col(position = "dodge", color = "black") +
+  scale_fill_manual(values = rev(gray.colors(4))) +
+  facet_wrap(~ age, scales = "free", nrow = 1) +
+  ggtitle("Po dodatkowych zmianach")
 ```
 
 Cel: pokazanie liczby osób w danym wieku uzyskujących prawo jazdy w danym roku.
@@ -117,7 +129,7 @@ group_by(dat, month, year, voivodeship) %>%
   ggplot(aes(x = month, y = total, group = year)) +
   geom_point() +
   geom_line() + 
-  facet_wrap(~ year) +
+  facet_wrap(~ year, nrow = 1) +
   labs(title = "Po zmianach", subtitle = "Zmienność liczby praw jazdy w poszczególnych miesiącach dla województwa mazowieckiego w latach 2019 - 2022")
 ```
 
